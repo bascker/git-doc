@@ -1,6 +1,14 @@
 # Git 操作文档
 Git [文档地址](https://git-scm.com/book/zh/v2)
 
+## 目录
+* [安装](#安装)
+* [配置](#配置)
+* [初始化仓库](#初始化仓库)
+* [获取项目](#获取项目)
+* [更新代码](#更新代码)
+* [分支管理](#分支管理)
+
 ## 安装
 linux 下 git 安装很简单，apt-get 和 yum 直接装即可.
 ```language
@@ -59,7 +67,7 @@ remote: error: To squelch this message and still keep the default behaviour, set
 remote: error: 'receive.denyCurrentBranch' configuration variable to 'refuse'.
 ```
 
-## 拉取项目
+## 获取项目
 git 支持 ssh/http(s)/ftp(s) 方式来获取远端代码. 通过`git clone`命令即可.
 ```language
 $ git clone https://USER_NAME:USER_PASS@IP/sample.git

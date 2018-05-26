@@ -16,10 +16,9 @@ Git [文档地址](https://git-scm.com/book/zh/v2)
 * [变基操作](#变基操作)
 * [暂存变更](#暂存变更)
 * [获取指定分支代码](#获取指定分支代码)
-* [附录A 本地版本库](#附录A 本地版本库)
-* [附录B 支持 http 方式 clone](#附录B 支持 http 方式 clone)
-* [附录C 将 git 上的项目 push 到自己的 repo](#附录C 将 git 上的项目 push 到自己的 repo)
-
+* [附录A 本地版本库](#appendix_a)
+* [附录B 支持 http 方式 clone](#appendix_b)
+* [附录C 将 git 上的项目 push 到自己的 repo](#appendix_c)
 ## 安装
 linux 下 git 安装很简单，apt-get 和 yum 直接装即可.
 ```
@@ -288,6 +287,7 @@ $ git fetch origin ORIGIN_BRANCE_NAME
 $ git checkout -b LOCAL_BRANCH_NAME origin/ORIGIN_BRANCE_NAME
 ```
 
+<b id="appendix_a"></b>
 ## 附录A 本地版本库
 若没有远程 git 仓库，没法很好的练习 git 操作咋办呢？没问题，我们可以使用本地版本库。通过在本地创建一个 git 仓库，可以将其 clone 到另一路径，然后进行 git 操作.
 ```
@@ -298,6 +298,7 @@ $ cd ..
 $ git clone repo/sample.git
 ```
 
+<b id="appendix_b"></b>
 ## 附录B 支持 http 方式 clone
 想通过 HTTP 方式来进行 git clone 操作，是需要配置 httpd 服务的.
 ### 1 安装软件
@@ -353,6 +354,7 @@ $ git clone http://***/git/sample.git
 Cloning into 'sample'...
 ```
 
+<b id="appendix_c"></b>
 ## 附录C 将 git 上的项目 push 到自己的 repo
 以 spring-framework 为例，当 clone 下这个项目后，改动代码，提交变更, 然后 push 的话会 push 到 github 上去。那么如果我们只想将代码 push 到自己的 git 仓库呢？其实很简单，只需要添加自己的远程仓库地址，在 push 是选择 push 到我们自己的仓库就行.
 ```language

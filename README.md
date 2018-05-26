@@ -13,7 +13,12 @@ Git [文档地址](https://git-scm.com/book/zh/v2)
 * [查看状态](#查看状态)
 * [查看历史](#查看历史)
 * [标签管理](#标签管理)
-* [变基操作](#变基)
+* [变基操作](#变基操作)
+* [暂存变更](#暂存变更)
+* [获取指定分支代码](#获取指定分支代码)
+* [附录A 本地版本库](#附录A 本地版本库)
+* [附录B 支持 http 方式 clone](#附录B 支持 http 方式 clone)
+* [附录C 将 git 上的项目 push 到自己的 repo](#附录C 将 git 上的项目 push 到自己的 repo)
 
 ## 安装
 linux 下 git 安装很简单，apt-get 和 yum 直接装即可.
@@ -254,3 +259,109 @@ pick aea2a1b add b2.txt
 #
 # Note that empty commits are commented out
 ```
+
+## 暂存变更
+有时候我们还未开发代码完毕，需要切到其他分支，但又不想执行 commit 提交变更时，可通过`git stash`命令来暂存变更.
+```
+$ echo ccc > c.txt
+$ git stash				# 暂存变更
+$ git stash list
+stash@{0}: WIP on bascker: aea2a1b add b2.txt
+
+# 切换到其他分支, 执行某些操作
+$ git checkout master
+$ ...
+
+# 切换回后，取回缓存
+$ git stash pop
+
+# 再执行 git stash list 显示没有暂存了
+```
+
+## 获取指定分支代码
+有时候我们需要获取指定分支的代码，怎么办呢？可以通过`git fetch & git checkout` 来实现.
+```
+# 1.fetch 指定分支到本地
+$ git fetch origin ORIGIN_BRANCE_NAME
+
+# 2.将远程分支映射到本地
+$ git checkout -b LOCAL_BRANCH_NAME origin/ORIGIN_BRANCE_NAME
+```
+
+## 附录A 本地版本库
+若没有远程 git 仓库，没法很好的练习 git 操作咋办呢？没问题，我们可以使用本地版本库。通过在本地创建一个 git 仓库，可以将其 clone 到另一路径，然后进行 git 操作.
+```
+$ cd repo
+$ git init sample.git
+
+$ cd ..
+$ git clone repo/sample.git
+```
+
+## 附录B 支持 http 方式 clone
+想通过 HTTP 方式来进行 git clone 操作，是需要配置 httpd 服务的.
+### 1 安装软件
+为了使用 git-http-backend(支持 git 的 CGI 程序), 需要按照 git-core，apache 支持 git 就靠它
+```
+$ yum install -y git git-core httpd
+```
+
+### 2 配置 http 账户
+```
+# 修改仓库所有者，使得 apache 可以访问
+$ chown -R apache:apache /workspace/gitrepo
+
+# 创建 apache 账户 tanlang.
+# -m：使用 MD5 算法对密码进行加密
+# -c：创建一个加密文件
+$ htpasswd -m -c /etc/httpd/conf.d/git.htpassd tanlang
+New password:
+Re-type new password:
+Adding password for user tanlang
+
+# 修改 git.htpasswd 文件的所有者与所属群组, 以及权限
+$ chown apache:apache /etc/httpd/conf.d/git.htpassd
+$ chmod 640 /etc/httpd/conf.d/git.htpassd
+```
+### 3 配置 httpd
+修改 `/etc/httpd/conf/httpd.conf` 配置文件，末尾添加如下内容.
+```
+<VirtualHost *:80>
+        ServerName 106.xxxx.xxx                                     # 服务器地址/域名
+        SetEnv GIT_HTTP_EXPORT_ALL
+        SetEnv GIT_PROJECT_ROOT /workspace/gitrepo/                 # 代码存放路径
+        ScriptAlias /git/ /usr/libexec/git-core/git-http-backend/   # 以/git/开头的访问路径映射至git的CGI程序git-http-backend
+        <Location />
+                AuthType Basic
+                AuthName "Git"
+                AuthUserFile /etc/httpd/conf.d/git.htpasswd         # 验证用户帐户的文件
+                Require valid-user
+        </Location>
+</VirtualHost>
+```
+
+### 4 启动服务
+```
+$ systemctl enable httpd
+$ systemctl start httpd
+```
+
+### 5 测试
+通过以上步骤，就可以使用 http 方式进行 clone 了.
+```language
+$ git clone http://***/git/sample.git
+Cloning into 'sample'...
+```
+
+## 附录C 将 git 上的项目 push 到自己的 repo
+以 spring-framework 为例，当 clone 下这个项目后，改动代码，提交变更, 然后 push 的话会 push 到 github 上去。那么如果我们只想将代码 push 到自己的 git 仓库呢？其实很简单，只需要添加自己的远程仓库地址，在 push 是选择 push 到我们自己的仓库就行.
+```language
+$ git remote add bascker ssh://IP/root/workspace/gitrepo/spring-framework.git
+$ git remote -v
+origin  https://github.com/spring-projects/spring-framework.git (fetch)
+origin  https://github.com/spring-projects/spring-framework.git (push)
+bascker ssh://IP/root/workspace/gitrepo/spring-framework.git (fetch)
+bascker ssh://IP/root/workspace/gitrepo/spring-framework.git (push)
+```
+用小乌龟 push 时，选择目标 bascker 分支即可.
+![appendix_c](assert/appendix_c.png)

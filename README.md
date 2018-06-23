@@ -1,11 +1,14 @@
 # Git 操作文档
 Git 是一个十分流行的版本控制系统，Git 和 SVN 区别在于，`SVN`使用**增量文件系统**，存储每次提交之间的差异。而 `git` 使用**全量文件系统**，存储每次提交的文件的全部内容(snapshot)。
 
+git 保存的不是文件的变化或者差异，而是**一系列不同时刻的文件快照**。
+
 Git [文档地址](https://git-scm.com/book/zh/v2)
 
 ## 目录
 * [安装](#安装)
 * [配置](#配置)
+	* [别名](#别名)
 * [初始化仓库](#初始化仓库)
 * [获取项目](#获取项目)
 * [更新代码](#更新代码)
@@ -48,6 +51,14 @@ $ git config --global user.email "xxx@xx.com"
 # 查看 git 配置信息
 $ git config --list
 ```
+### 别名
+跟 linux 别名命令 `alias` 一样，git 也可以设置别名。
+```
+# 给 checkout 设置别名 ck，git ck 等价于 git checkout
+$ git config --global alias.ck checkout
+$ git config -l | grep alias
+alias.ck=checkout
+```
 
 ## 初始化仓库
 使用`git init`可以创建一个 git 仓库。一般而言，纯粹用于版本控制的仓库，以 `.git`结尾。
@@ -75,6 +86,12 @@ remote: error: arranged to update its work tree to match what you pushed in some
 remote: error: other way.
 remote: error: To squelch this message and still keep the default behaviour, set
 remote: error: 'receive.denyCurrentBranch' configuration variable to 'refuse'.
+```
+
+上面这个配置比较麻烦，可以在创建 git 仓库时一次性解决。使用如下命令即可。
+```
+# --shared 参数
+$ git init --bare --shared sample.git
 ```
 
 ## 获取项目
@@ -120,6 +137,26 @@ $ git branch -d bascker
 ```
 $ git push --set-upstream origin bascker
 ```
+**git 分支本质就是指向提交对象（校验和文件）的指针**，每次 commit，指针都会移动，指向最后一个 commit 对象。commit 流程图如下所示。
+![commit_flow](assert/commit_flow.png)
+
+特殊 HEAD 指针，指向当前分支。若当前在 master 分支，则 HEAD 指向 master 分支。若在 bascker 分支，则指向 bascker。
+```
+# 使用 --decorate 查看分支各分支指针所指向的对象
+$ git log --oneline --decorate
+aa403d4 (HEAD -> master, bascker) add b2.txt
+...
+```
+如上，HEAD 指向 master 分支，master & bascker 均执行 aa403d4 提交对象。
+
+### 分支合并
+当在分支 bascker 上进行开发后，想把代码合入主干 master，就可以执行合并操作 `git merge`.
+```
+# master 分支执行
+$ git merge bascker
+```
+若出现冲突，则解决完冲突，在继续 merge.
+> Note：除第一次 commit 外，每次 commit 对象都会有一个父对象，多分支合并产生的 commit 对象有多个父对象。
 
 ## 查看状态
 使用 git status 可以查看当前工作目录的状态，查看索引内容,哪些文件被暂存了(在Git索引中), 哪些文件被修改了但是没有暂存, 哪些文件没有被跟踪(untracked)。git 十分人性化的一点就在于每一个时间点，使用 git status 都有提示，告诉你下一步怎么做.
@@ -166,6 +203,12 @@ index 0000000..3c8969b
 +++ b/a.txt
 @@ -0,0 +1 @@
 +aaa
+
+# 使用 --oneline 可以将各个 commit 信息简单化
+$ git log --oneline
+aa403d4 add b2.txt
+e4bf2fe add b1.txt
+...
 ```
 > git show 用于查看 git 对象信息, 每一次提交都是一个 commit 对象，包括分支、tag 也是对象.
 

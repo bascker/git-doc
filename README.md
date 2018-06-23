@@ -408,5 +408,5 @@ origin  https://github.com/spring-projects/spring-framework.git (push)
 bascker ssh://IP/root/workspace/gitrepo/spring-framework.git (fetch)
 bascker ssh://IP/root/workspace/gitrepo/spring-framework.git (push)
 ```
-用小乌龟 push 时，选择目标 bascker 分支即可.
+用小乌龟 push 时，选择目标 bascker 分支即可.  
 ![appendix_c](assert/appendix_c.png)

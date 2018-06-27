@@ -22,6 +22,7 @@ Git [文档地址](https://git-scm.com/book/zh/v2)
 * [附录A 本地版本库](#appendix_a)
 * [附录B 支持 http 方式 clone](#appendix_b)
 * [附录C 将 git 上的项目 push 到自己的 repo](#appendix_c)
+
 ## 安装
 linux 下 git 安装很简单，apt-get 和 yum 直接装即可.
 ```
@@ -137,7 +138,7 @@ $ git branch -d bascker
 ```
 $ git push --set-upstream origin bascker
 ```
-**git 分支本质就是指向提交对象（校验和文件）的指针**，每次 commit，指针都会移动，指向最后一个 commit 对象。commit 流程图如下所示。
+**git 分支本质就是指向提交对象（校验和文件）的指针**，每次 commit，指针都会移动，指向最后一个 commit 对象。commit 流程图如下所示。  
 ![commit_flow](assert/commit_flow.png)
 
 特殊 HEAD 指针，指向当前分支。若当前在 master 分支，则 HEAD 指向 master 分支。若在 bascker 分支，则指向 bascker。
@@ -260,8 +261,9 @@ $ git checkout v1.1
 ```
 
 ## 变基操作
-一般都是使用`git merge`进行分支合并, 但还有一种更棒的方式就是`git rebase`变基操作.所谓变基，就是变更基线.
+一般都是使用`git merge`进行分支合并, 但还有一种更棒的方式就是`git rebase`变基操作.所谓变基，就是变更基线.  
 ![rebase案例](assert/rebase.png)
+
 如图所示，我们基于 master 创建了 merge 和 rebase 分支, 在 merge 和 rebase 分支上分别前进了 2 次, 与此同时, master 也前进了, 这时候我们分别在 merge 分支执行 `git merge master` 和在 rebasr 分支执行 `git rebase master` 利用 `gitk` 查看结果，可以看到 rebase 操作的分支历史比 merge 干净整洁很多.
 > Note: gitk 是一个以图形的方式显示项目历史的命令
 
@@ -340,6 +342,12 @@ $ git init sample.git
 $ cd ..
 $ git clone repo/sample.git
 ```
+其实就是 git 本地协议的支持，将本地硬盘的一个目录作为远程版本库来使用。git 支持 4 种协议：
+
+* 本地协议
+* HTTP(S) 协议
+* SSH 协议
+* git 协议
 
 <b id="appendix_b"></b>
 ## 附录B 支持 http 方式 clone

@@ -19,6 +19,7 @@ Git [文档地址](https://git-scm.com/book/zh/v2)
 * [变基操作](#变基操作)
 * [暂存变更](#暂存变更)
 * [获取指定分支代码](#获取指定分支代码)
+* [回滚操作](#回滚操作)
 * [附录A 本地版本库](#appendix_a)
 * [附录B 支持 http 方式 clone](#appendix_b)
 * [附录C 将 git 上的项目 push 到自己的 repo](#appendix_c)
@@ -330,6 +331,63 @@ $ git fetch origin ORIGIN_BRANCE_NAME
 
 # 2.将远程分支映射到本地
 $ git checkout -b LOCAL_BRANCH_NAME origin/ORIGIN_BRANCE_NAME
+```
+
+## 回滚操作
+git 操作万一失误了，怎么办？ 放心，git 提供了强大的故障恢复机制，提供 `git reset` 命令来提供回滚操作。
+```
+$ echo "just a text" > test.txt
+# 对 test.txt 进行跟踪
+$ git add .
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+        new file:   test.txt
+
+# 回滚
+$ git reset
+$ git status
+On branch master
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+        test.txt
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+$ rm c.txt
+$ git add .
+$ git commit -m "rm c.txt"
+$ git log --oneline
+0ac49d7 rm c.txt
+aa403d4 add b2.txt
+e4bf2fe add b1.txt
+...
+$ ls
+a.txt*  b.txt*  b1.txt*  b2.txt*
+
+# 回滚到 rm 前的
+$ git reset --hard HEAD~2
+HEAD is now at e4bf2fe add b1.txt
+$ ls
+a.txt*  b.txt*  b1.txt*  c.txt*
+$ git log --oneline
+e4bf2fe add b1.txt
+b0ccab5 c.txt
+...
+```
+
+也可以搭配 git reflog（可看到所有的 git 操作记录） 来进行回滚，如执行了错误的 rebase 时，就可以搭配进行救急。
+```
+$ git reflog
+e7ebdde HEAD@{0}: reset: moving to HEAD~1
+d7154af HEAD@{1}: commit: add test.txt
+e7ebdde HEAD@{2}: reset: moving to HEAD
+
+# 回滚到 add test.txt 这个阶段
+$ git reset --hard HEAD@{1}
 ```
 
 <b id="appendix_a"></b>

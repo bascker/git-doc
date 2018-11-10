@@ -305,29 +305,43 @@ git rebase 还拥有将多个 commit 合并成一个 commit 的逆天功能，�
 # 将前 2 次提交进行 rebase
 $ git rebase -i HEAD~2
 ```
-这样就会进入命令模式, 然后根据提示进行操作即可
+这样就会进入命令模式, 然后此时我们将除第一行的 pick 外，全部改为 s
 ```
+# 原来自动提示的
 pick f8f5714 add b1.txt
 pick aea2a1b add b2.txt
 
-# Rebase ba6bea9..aea2a1b onto ba6bea9 (2 command(s))
-#
-# Commands:
-# p, pick = use commit
-# r, reword = use commit, but edit the commit message
-# e, edit = use commit, but stop for amending
-# s, squash = use commit, but meld into previous commit
-# f, fixup = like "squash", but discard this commit's log message
-# x, exec = run command (the rest of the line) using shell
-#
-# These lines can be re-ordered; they are executed from top to bottom.
-#
-# If you remove a line here THAT COMMIT WILL BE LOST.
-#
-# However, if you remove everything, the rebase will be aborted.
-#
-# Note that empty commits are commented out
+# 修改后的
+pick f8f5714 add b1.txt
+s aea2a1b add b2.txt
 ```
+保存后，会自动弹出命令模式，修改 commit 的 message 信息
+```
+# This is a combination of 2 commits.
+# The first commit's message is:
+
+add b1.txt
+
+# This is the 2nd commit message:
+
+add b2.txt
+```
+我们将commit信息改为如下
+```
+# This is a combination of 2 commits.
+add b1.txt, b2.txt
+```
+保存后，rebase 操作会逐一将第一条、第二条commit 进行合并
+```
+[detached HEAD 89b4f07] add b1.txt, b2.txt
+ Date: Sat Nov 10 15:19:09 2018 +0800
+ 1 file changed, 138 insertions(+), 12 deletions(-)
+Successfully rebased and updated refs/heads/master.
+```
+
+**Note**
+1. 若 rebase 过程出现 conflict，则解决冲突后，执行 `git rebase --continue` 即可
+2. 若不想 rebase 了，则 `ctrl + c` 中断后，执行 `git rebase --abort` 即可
 
 ## 暂存变更
 有时候我们还未开发代码完毕，需要切到其他分支，但又不想执行 commit 提交变更时，可通过`git stash`命令来暂存变更.

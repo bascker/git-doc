@@ -20,9 +20,11 @@ Git [文档地址](https://git-scm.com/book/zh/v2)
 * [暂存变更](#暂存变更)
 * [获取指定分支代码](#获取指定分支代码)
 * [回滚操作](#回滚操作)
-* [附录A 本地版本库](#appendix_a)
-* [附录B 支持 http 方式 clone](#appendix_b)
-* [附录C 将 git 上的项目 push 到自己的 repo](#appendix_c)
+* [附录]
+    * [本地版本库](#appendix_a)
+    * [支持 http 方式 clone](#appendix_b)
+    * [将 git 上的项目 push 到自己的 repo](#appendix_c)
+    * [同步两个远端仓库代码](#appendix_d)
 
 ## 安装
 linux 下 git 安装很简单，apt-get 和 yum 直接装即可.
@@ -115,8 +117,20 @@ $ git commit -m "描述信息"
 # 推送到远端代码库
 $ git push
 ```
-
 对于 commit 而言, 注释最好以一行短句子(小于 50 个字符)作为开头, 然后空一行再把进行详细的注释,这样可以很方便的用工具把 commit 注释变成 email 通知，第一行作为标题，剩下的部分就作 email 正文.
+
+强制覆盖远端分支，可以使用 -f 选项.
+```
+$ git push -f origin master
+```
+
+push 也可用于删除远端分支
+```
+# 语法: git push -f origin :BRANCH_NAME
+$ git push -f origin :test
+To https://github.com/bascker/sample.git
+ - [deleted]         test
+```
 
 ## 分支管理
 一般使用 `git branch` 和 `git checkout` 进行基础的分支管理操作.当然更进一步就是使用`git merge/fetch/rebase`命令了(这些命令的使用, 容后再议).
@@ -261,6 +275,16 @@ index 0000000..3c8969b
 $ git checkout v1.1
 ```
 
+若要获取远端仓库所有 tag，则可以执行如下操作
+```
+# fetch 拉取远端所有 tag 到本地
+$ git fetch --tags
+
+# 切换到指定 tag 1.6.1
+# 语法: git checkout -b LOCAL_BRANCH_NAME ORIGIN_TAG_NAME
+$ git checkout -b 1.6.1 1.6.1
+```
+
 ## 变基操作
 一般都是使用`git merge`进行分支合并, 但还有一种更棒的方式就是`git rebase`变基操作.所谓变基，就是变更基线.  
 ![rebase案例](assert/rebase.png)
@@ -391,7 +415,8 @@ $ git reset --hard HEAD@{1}
 ```
 
 <b id="appendix_a"></b>
-## 附录A 本地版本库
+## 附录
+### 本地版本库
 若没有远程 git 仓库，没法很好的练习 git 操作咋办呢？没问题，我们可以使用本地版本库。通过在本地创建一个 git 仓库，可以将其 clone 到另一路径，然后进行 git 操作.
 ```
 $ cd repo
@@ -408,15 +433,15 @@ $ git clone repo/sample.git
 * git 协议
 
 <b id="appendix_b"></b>
-## 附录B 支持 http 方式 clone
+### 支持 http 方式 clone
 想通过 HTTP 方式来进行 git clone 操作，是需要配置 httpd 服务的.
-### 1 安装软件
+#### 1 安装软件
 为了使用 git-http-backend(支持 git 的 CGI 程序), 需要按照 git-core，apache 支持 git 就靠它
 ```
 $ yum install -y git git-core httpd
 ```
 
-### 2 配置 http 账户
+#### 2 配置 http 账户
 ```
 # 修改仓库所有者，使得 apache 可以访问
 $ chown -R apache:apache /workspace/gitrepo
@@ -433,7 +458,7 @@ Adding password for user tanlang
 $ chown apache:apache /etc/httpd/conf.d/git.htpassd
 $ chmod 640 /etc/httpd/conf.d/git.htpassd
 ```
-### 3 配置 httpd
+#### 3 配置 httpd
 修改 `/etc/httpd/conf/httpd.conf` 配置文件，末尾添加如下内容.
 ```
 <VirtualHost *:80>
@@ -450,13 +475,13 @@ $ chmod 640 /etc/httpd/conf.d/git.htpassd
 </VirtualHost>
 ```
 
-### 4 启动服务
+#### 4 启动服务
 ```
 $ systemctl enable httpd
 $ systemctl start httpd
 ```
 
-### 5 测试
+#### 5 测试
 通过以上步骤，就可以使用 http 方式进行 clone 了.
 ```language
 $ git clone http://***/git/sample.git
@@ -464,7 +489,7 @@ Cloning into 'sample'...
 ```
 
 <b id="appendix_c"></b>
-## 附录C 将 git 上的项目 push 到自己的 repo
+### 将 git 上的项目 push 到自己的 repo
 以 spring-framework 为例，当 clone 下这个项目后，改动代码，提交变更, 然后 push 的话会 push 到 github 上去。那么如果我们只想将代码 push 到自己的 git 仓库呢？其实很简单，只需要添加自己的远程仓库地址，在 push 是选择 push 到我们自己的仓库就行.
 ```language
 $ git remote add bascker ssh://IP/root/workspace/gitrepo/spring-framework.git
@@ -476,3 +501,104 @@ bascker ssh://IP/root/workspace/gitrepo/spring-framework.git (push)
 ```
 用小乌龟 push 时，选择目标 bascker 分支即可.  
 ![appendix_c](assert/appendix_c.png)
+
+<b id="appendix_d"></b>
+### 两个仓库的代码同步
+git使用中可能存在两个远程仓库需要进行代码同步的场景。比如很久以前，将所有项目模块继承在一个 Maven 项目 projectA 中，突然某一天需要将其中的
+模块 moduleB 从中移出，单独建立一个项目 projectB，作为独立服务。但此时因为无法立即迁移，还需要在 projectA 中继续进行 moduleB 的代码
+编辑，因此需要将在 projectA 中的 moduleB 最新提交的代码同步到 projectB。如何执行？
+> sample.git 作为 projectA，demo.git 作为 projectB
+
+主要应用以下 3 个 git 操作的语法
+```
+# 添加远端地址
+$ git remote add NAME REMOTE_GIT_ADDRESS
+
+# 推送指定 commit 到远端
+$ git push <remote name> <commit hash>:<remote branch name>
+
+# 将指定 commit 应用到当前分支
+$ git cherry-pick COMMIT_HASH
+```
+
+#### 方法1 git remote & git push
+使用 `git remote add` & `git push 指定commit号`来解决
+```
+$ git remote -v
+origin  https://github.com/bascker/sample.git (fetch)
+origin  https://github.com/bascker/sample.git (push)
+
+# 1. 添加 demo.git 的远端地址
+$ git remote add demo https://github.com/bascker/demo.git
+
+$ git remote -v
+demo  https://github.com/bascker/demo.git (fetch)
+demo  https://github.com/bascker/demo.git (push)
+origin  https://github.com/bascker/sample.git (fetch)
+origin  https://github.com/bascker/sample.git (push)
+
+# 2. 在 sample 中修改代码
+$ echo "demo" > demo.txt
+$ git add demo.txt
+$ git commit -m "Update Demo"
+$ git log
+commit a6e869d8f671320416f82607bd451cf958e017da
+Author: bascker <xxxx@xxx.com>
+Date:   Sat Nov 10 14:42:09 2018 +0800
+
+  Update Demo
+
+# 3. 推送到 sample.git
+$ git push origin master
+
+# 4. 将本次对 demo 的修改 commit 推送到 demo.git
+$ git push demo a6e869d8f671320416f82607bd451cf958e017da:master
+Counting objects: 3, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (3/3), 278 bytes | 0 bytes/s, done.
+Total 3 (delta 1), reused 0 (delta 0)
+To https://github.com/bascker/demo.git
+ + d7154af...a6e869d a6e869d8f671320416f82607bd451cf958e017da -> master
+```
+
+#### 方法2 git remote & git cherry-pick
+使用 `git remote add` & `git cherry-pick`来解决
+```
+# demo.git
+$ git remote -v
+origin  https://github.com/bascker/demo.git (fetch)
+origin  https://github.com/bascker/demo.git (push)
+
+# 1. 添加 sample.git 的远端地址
+$ git remote add sample https://github.com/bascker/sample.git
+
+$ git remote -v
+origin  https://github.com/bascker/demo.git (fetch)
+origin  https://github.com/bascker/demo.git (push)
+sample  https://github.com/bascker/sample.git (fetch)
+sample  https://github.com/bascker/sample.git (push)
+
+# 2. 在 sample 中修改代码
+$ echo "demo" > demo.txt
+$ git add demo.txt
+$ git commit -m "Update Demo"
+$ git log
+commit a6e869d8f671320416f82607bd451cf958e017da
+Author: bascker <xxxx@xxx.com>
+Date:   Sat Nov 10 14:42:09 2018 +0800
+
+  Update Demo
+
+# 3. 推送到 sample.git
+$ git push origin master
+
+# 4. 在 demo 中拉取 sample 的最新代码, 从而得到 sample 中最新对 demo 修改的 commit 号
+$ git fetch sample master
+
+# 5. 将对 demo 修改的 commit 应用到当前分支, 若有冲突，则解决
+$ git cherry-pick a6e869d8f671320416f82607bd451cf958e017da
+
+# 6. 推送到远端
+$ git push origin master
+```

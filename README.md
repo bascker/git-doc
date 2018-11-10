@@ -20,7 +20,7 @@ Git [文档地址](https://git-scm.com/book/zh/v2)
 * [暂存变更](#暂存变更)
 * [获取指定分支代码](#获取指定分支代码)
 * [回滚操作](#回滚操作)
-* [附录]
+* [附录](#appendix_a)
     * [本地版本库](#appendix_a)
     * [支持 http 方式 clone](#appendix_b)
     * [将 git 上的项目 push 到自己的 repo](#appendix_c)

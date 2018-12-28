@@ -25,6 +25,7 @@ Git [文档地址](https://git-scm.com/book/zh/v2)
     * [支持 http 方式 clone](#appendix_b)
     * [将 git 上的项目 push 到自己的 repo](#appendix_c)
     * [同步两个远端仓库代码](#appendix_d)
+    * [覆盖本地代码](#appendix_e)
 
 ## 安装
 linux 下 git 安装很简单，apt-get 和 yum 直接装即可.
@@ -615,4 +616,15 @@ $ git cherry-pick a6e869d8f671320416f82607bd451cf958e017da
 
 # 6. 推送到远端
 $ git push origin master
+```
+<b id="appendix_e"></b>
+### 覆盖掉本地代码
+1.获取远端最新代码
+```
+$ git fetch --all
+```
+
+2.重置 HEAD 到指定分支
+```
+$ git reset --hard origin/master
 ```

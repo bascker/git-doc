@@ -133,6 +133,12 @@ To https://github.com/bascker/sample.git
  - [deleted]         test
 ```
 
+拉取远端最新代码
+```
+# 推荐在 pull 时使用 rebase 选项
+git pull --rebase origin master
+```
+
 ## 分支管理
 一般使用 `git branch` 和 `git checkout` 进行基础的分支管理操作.当然更进一步就是使用`git merge/fetch/rebase`命令了(这些命令的使用, 容后再议).
 

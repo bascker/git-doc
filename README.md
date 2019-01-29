@@ -20,6 +20,7 @@ Git [文档地址](https://git-scm.com/book/zh/v2)
 * [暂存变更](#暂存变更)
 * [获取指定分支代码](#获取指定分支代码)
 * [回滚操作](#回滚操作)
+* [cherry-pick](#cherry-pick)
 * [附录](#appendix_a)
     * [本地版本库](#appendix_a)
     * [支持 http 方式 clone](#appendix_b)
@@ -433,6 +434,70 @@ e7ebdde HEAD@{2}: reset: moving to HEAD
 
 # 回滚到 add test.txt 这个阶段
 $ git reset --hard HEAD@{1}
+```
+
+## cherry-pick
+使用 `git cherry-pick` 可以将某个commit 应用到当前分支
+```
+$ git cherry-pick COMMIT_ID
+```
+有时候使用 git cherry-pick 时，可能会遇到如下信息提示.
+```
+$ git cherry-pick a6e8
+error: commit a6e8 is a merge but no -m option was given.
+fatal: cherry-pick failed
+
+# 查看 git 历史
+$ git log
+commit a6e8a28a518e5124d5ce53c08d4211583c5fd9c5
+Author: bascker ...
+Date:   ...
+
+    CCC
+
+commit 3f1b6ab19ced3d1ab1570e6b820b9fe55cc8ca3b
+Author: bascker ...
+Date:   ...
+
+    Merge branch "br_test" of code...
+
+commit 7f6862f9a31bc0da2eaa0a6426f0fb54baf1bfae
+Author: bascker ...
+Date:   ...
+
+    BBB
+
+commit 0a6aabf9a31bc0da2eaa0a6426f0fb54baf1bfae
+Author: bascker ...
+Date:   ...
+
+    AAA
+```
+出现这个问题是因为提交的代码之前 pull 了其他人的代码并合入到了自己本地的代码。产生了
+一个merge后，又push到代码仓。
+
+查看 a6e8 这个 commits
+```
+$ git show a6e8
+Author: bascker xxxx
+Committer: bascker xxxx
+Parent: 7f6862...
+Parent: 0a6aab...
+Child: 382f5da...
+```
+可以看到parent节点有2个，一个merge里有多个父节点，cherry-pick的时候至少要指定一个
+父节点。可以使用 -m parent-num 来设置。parent-num默认从 1 开始，如上述 2 个节点，
+ 7f 编号为 1，0a 编号为 2.
+```
+# 将 a6e8 这个 commit 的父节点指向 7f68
+$ git cherry-pick a6e8 -m 1
+...
+
+# 再次看历史，会变成如下
+$ git log
+CCC
+BBB
+AAA
 ```
 
 <b id="appendix_a"></b>

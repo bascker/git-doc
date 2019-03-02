@@ -155,6 +155,9 @@ Switch to a new branch 'bascker'
 
 # 删除分支: 若使用 -D，则强制删除
 $ git branch -d bascker
+
+# 修改分支名
+$ git branch -m OLD_NAME NEW_NAME
 ```
 
 第一次 push 本地分支代码到远端时, 需要加 --set-upstream, 从而在远端创建一个分支.
@@ -172,6 +175,17 @@ aa403d4 (HEAD -> master, bascker) add b2.txt
 ...
 ```
 如上，HEAD 指向 master 分支，master & bascker 均执行 aa403d4 提交对象。
+
+对于远端分支的管理，则使用 git remote 命令。
+```
+# 查看远端分支
+$ git remote -v
+origin  https://github.com/bascker/git-doc.git (fetch)
+origin  https://github.com/bascker/git-doc.git (push)
+
+# 修改远端仓库，如当远端仓库被修改时，可以使用
+$ git remote set-url NAME NEW_URL OLD_URL
+```
 
 ### 分支合并
 当在分支 bascker 上进行开发后，想把代码合入主干 master，就可以执行合并操作 `git merge`.
